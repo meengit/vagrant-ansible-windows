@@ -2,11 +2,9 @@
 
 Please note: This document describes one of many ways to make Vagrant and Ansible playing together on Microsoft Windows. It is written with the intention to find a way that is compatible with as many Microsoft Windows hosts as possible. ***If you have questions, improvements, or found a bug, please file an issue.***
 
-## Opinion 
+## Context 
 
 When it comes to Microsoft Windows, ***Vagrant and its Ansible Provider*** aren't a good team because Windows is sitting behind. In a Google search, you can find many suggestions and tutorials making them play together - especially with the help of Microsoft's WSL platform. However, in my opinion, they all ending in a mess. Don't touch WSL at all! *So, what can we do? In short: migrate to https://chef.io[Chef.io] or a similar tool with full support for Microsoft Windows. If you are, like me, bound to Ansible in some projects, follow this tutorial.*
-
-First of all, I think there is no (technical) reason why Ansible and Microsoft Windows can't play together for the development in the Vagrant context - except corporate policies and corporate disinterest, maybe. In my opinion, on the one hand, RedHat, owned by IBM, won't make Ansible fully compatible with Microsoft Windows. On the other hand, Microsoft prefers to develop WSL to attack Linux instead of fixing long-term bugs of its operating system, Windows. And in between, we have HashiCorp and Vagrant, which have to deal with this situation as well as possible.
 
 ## Introduction
 
