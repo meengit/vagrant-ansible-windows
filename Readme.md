@@ -28,7 +28,7 @@ Ansible failed to complete successfully. Any error output should be
 visible above. Please fix these errors and try again.
 ```
 
-To solve this issue and run your Ansible playbooks against your Vagrant VM also on Windows, I'll now navigate you through a solution I got up and running on an increasing number of Windows hosts. I don't say that's the best solution nor the only one. Instead, I try to give you a way that is also working for you.
+To solve this issue and run your Ansible playbooks against your Vagrant VM also on Windows, I'll now navigate you through a solution I got up and running on an increasing number of Windows hosts. I don't say that's the best solution nor the only one. Instead, I try to give you a way that is also working for you. My work initially starts at Michael Maurizi's blog post <a href="#Maurizi001"><em>Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
 
 ## Install Cygwin
 
@@ -239,6 +239,8 @@ Vagrant.configure(VERSION) do |config|
 end
 ```
 
+The function `OS` was initially copied from <a href="#Silva001"><em>"Find out current OS inside Vagrantfile."</em></a> (Silva, 2014)
+
 ## Last step: Run it!
 
 To run Vagrant and Ansible in two steps, we create a little Shell script for the Cygwin environment:
@@ -261,3 +263,9 @@ OK! Great job, you are ready to start your VM and provision afterward. Do this i
 ```bash
 . ./vagrant-win.sh
 ```
+
+## Bibliography
+
+<a href="Maurizi001" style="text-decoration: none;color: black;">Maurizi, M. (2014, October 30).</a> _Running Vagrant with Ansible Provisioning on Windows._ Azavea. https://www.azavea.com/blog/2014/10/30/running-vagrant-with-ansible-provisioning-on-windows/
+
+<a href="Silva001" style="text-decoration: none;color: black;">Silva, B. (2014, November 12).</a> _Ruby—Vagrant—How to have host platform specific provisioning steps._ Stack Overflow. https://stackoverflow.com/questions/26811089/vagrant-how-to-have-host-platform-specific-provisioning-steps
