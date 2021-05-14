@@ -4,7 +4,7 @@ Please note: This document describes one of many ways to make Vagrant and Ansibl
 
 ## Context 
 
-When it comes to Microsoft Windows, ***Vagrant and its Ansible Provider*** aren't a good team because Windows is sitting behind. In a Google search, you can find many suggestions and tutorials making them play together - especially with the help of Microsoft's WSL platform. However, in my opinion, they all ending in a mess. Don't touch WSL at all! *So, what can we do? In short: migrate to https://chef.io[Chef.io] or a similar tool with full support for Microsoft Windows. If you are, like me, bound to Ansible in some projects, follow this tutorial.*
+When it comes to Microsoft Windows, ***Vagrant and its Ansible Provider*** aren't a good team because Windows is sitting behind. In a Google search, you can find many suggestions and tutorials making them play together - especially with the help of Microsoft's WSL platform. However, in my opinion, they all ending in a mess. Don't touch WSL at all! *So, what can we do? In short: migrate to [Chef.io](https://chef.io) or a similar tool with full support for Microsoft Windows. If you are, like me, bound to Ansible in some projects, follow this tutorial.*
 
 ## Introduction
 
@@ -28,11 +28,11 @@ Ansible failed to complete successfully. Any error output should be
 visible above. Please fix these errors and try again.
 ```
 
-To solve this issue and run your Ansible playbooks against your Vagrant VM also on Windows, I'll now navigate you through a solution I got up and running on an increasing number of Windows hosts. I don't say that's the best solution nor the only one. Instead, I try to give you a way that is also working for you. My work initially starts at Michael Maurizi's blog post <a href="#Maurizi001"><em>Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
+To solve this issue and run your Ansible playbooks against your Vagrant VM also on Windows, I'll now navigate you through a solution I got up and running on an increasing number of Windows hosts. I don't say that's the best solution nor the only one. Instead, I try to give you a way that is also working for you. My work initially starts at Michael Maurizi's blog post <a href="Maurizi001"><em>"Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
 
 ## Install Cygwin
 
-* Go to https://www.cygwin.com/[Cygwin's website] and download the installer to your `Downloads` folder.
+* Go to [Cygwin's website](https://www.cygwin.com/) and download the installer to your `Downloads` folder.
 * Double-click the installer and install Cygwin in its recommended place `C:\cygwin64`.
 
 ## Install the required Cygwin packages for Ansible
@@ -239,7 +239,7 @@ Vagrant.configure(VERSION) do |config|
 end
 ```
 
-The function `OS` was initially copied from <a href="#Silva001"><em>"Find out current OS inside Vagrantfile."</em></a> (Silva, 2014)
+The function `OS` was initially copied from <a href="Silva001"><em>"Find out current OS inside Vagrantfile."</em></a> (Silva, 2014)
 
 ## Last step: Run it!
 
@@ -266,6 +266,6 @@ OK! Great job, you are ready to start your VM and provision afterward. Do this i
 
 ## Bibliography
 
-<a href="Maurizi001" style="text-decoration: none;color: black;">Maurizi, M. (2014, October 30).</a> _Running Vagrant with Ansible Provisioning on Windows._ Azavea. https://www.azavea.com/blog/2014/10/30/running-vagrant-with-ansible-provisioning-on-windows/
+<a href="#Maurizi001" style="text-decoration: none;color: black;">Maurizi, M. (2014, October 30).</a> _Running Vagrant with Ansible Provisioning on Windows._ Azavea. https://www.azavea.com/blog/2014/10/30/running-vagrant-with-ansible-provisioning-on-windows/
 
-<a href="Silva001" style="text-decoration: none;color: black;">Silva, B. (2014, November 12).</a> _Ruby—Vagrant—How to have host platform specific provisioning steps._ Stack Overflow. https://stackoverflow.com/questions/26811089/vagrant-how-to-have-host-platform-specific-provisioning-steps
+<a href="#Silva001" style="text-decoration: none;color: black;">Silva, B. (2014, November 12).</a> _Ruby—Vagrant—How to have host platform specific provisioning steps._ Stack Overflow. https://stackoverflow.com/questions/26811089/vagrant-how-to-have-host-platform-specific-provisioning-steps
