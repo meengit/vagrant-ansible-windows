@@ -82,51 +82,9 @@ alias pip='python3 -m pip'
 * `PYTHONPATH` points Python to additional directories holding private libraries. In the context of Cygwin, Python gets installed in the `lib` folder of Cygwin, and we have to make sure, Python recognizing this fact.
 * In the third line, we're map the `pip` command correctly into our Cygwin environment.
 
-But why we have to set this? Depending on your environment, it's maybe optional. Settings these  properties makes sure we have no conflicts with possible "native" Python installations on Microsoft Windows (for instance in `C:\Python39\python.exe`).
+But why we have to set this? Depending on your environment, it's maybe optional. Settings these properties makes sure we have no conflicts with possible "native" Python installations on Microsoft Windows (for instance in `C:\Python39\python.exe`).
 
-### Optional but recommended
-
-Microsoft Windows may have a problem with the long filenames which are used by Cygwin sometimes. To prevent time-consuming errors relying on long path names, set the Windows registry value of `LongPathsEnabled` in `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem` to `1`.
-
-![Set Regedit value](./images/regedit-LongPathsEnabled.png)
-
-##  Redirect `ansible` and `ansible-*` from PowerShell to Cygwin
-
-You may want to use `ansible` also in the context of PowerShell and not only in the Cygwin shell. To achieve this, we have to make sure we're running Ansible in Cygwin's bash context each time it is called. To do so:
-
-* Create a directory called `Cygwin` in `C:\tools\`. If `C:\tools\` does not already exists, create it.
-* "Redirect" the Ansible commands from PowerShell to Cygwin when they are called. To do this, you have to create a BAT file for each Ansible command. You can find a complete list to copy or download [here](https://github.com/meengit/vagrant-ansible-windows/tree/main/tools/Cygwin). For demonstration purposes, I'll illustrate here only the BAT file for the `ansible` command itself:
-
-`ansible.bat`
-
-```bat
-@echo off
-
-set CYGWIN=C:cygwin
-
-REM You can switch this to work with bash with %CYGWIN%binzsh.exe
-set SH=%CYGWIN%/bin/bash.exe
-
-"%SH%" -c "/usr/local/bin/ansible %*"
-```
-
-Add `C:\tools\Cygwin` to Windows's _System Variables_:
-
-![Edit Windows's System Variables](./images/win-system-var.png)
-
-Add `C:\tools\Cygwin` to your user's path:
-
-![Edit Windows User's path](./images/win-user-path.png)
-
-## Let Cygwin access the insecure private key of Vagrant
-
-Run `C:\cygwin64\Cygwin.bat` _as Administrator_ and create a Symlink from your Cygwin home to the `.vagrant.d` directory in your Windows User's home:
-
-```bash
-# Replace __USER__ with your user name
-ln -s /cygdrive/c/Users/__USER__/.vagrant.d/ /home/__USER__/.vagrant.d
-```
-## Create the `ansible.cfg`
+### Create the `ansible.cfg`
 
 Create your "main" configuration file for Ansible in your Cygwin environment:
 
@@ -140,9 +98,9 @@ control_path = /tmp
 
 * Go to `C:\` and create the directory `C:\tmp\`
 
-## Prepare your inventory file
+### Prepare your inventory file
 
-In some cases, it may be helpful to create a dedicated inventory file just for Windows. However, you can also modify an existing inventory file. To make your inventory file ready to run in Cygwin's environment, first ask Vagrant for its SSH configuration. Open your Cygwin shell, go to your Vagrant project root and run:
+In some cases, it may be helpful to create a dedicated inventory file just for Windows. However, you can also modify an existing inventory file. To make your inventory file ready to run in Cygwin's environment, first ask Vagrant for its SSH configuration. Open a Cygwin shell _as Administrator_ (`C:\cygwin64\Cygwin.bat`), go to your Vagrant project root (`cd /cygdrive/c/path/to/your/project/root`) and run:
 
 ```bash
 vagrant ssh-config
@@ -160,7 +118,7 @@ Host default
   LogLevel FATAL
 ```
 
-Update your inventory file with the results from `vagrant ssh-config`:
+Update your inventory file with the results from `vagrant ssh-config`, but make sure `ansible_ssh_private_key_file` is set to Cgywin's full path:
 
 ```bash
 [server]
@@ -169,15 +127,74 @@ Update your inventory file with the results from `vagrant ssh-config`:
 [server:vars]
 ansible_user=vagrant
 # ansible_ssh_pass=vagrant # Optional
-ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+ansible_ssh_private_key_file=/cygdrive/c/Users/__USER__/.vagrant.d/insecure_private_key
 ansible_connection=ssh
 ansible_port=4000
 ansible_debug=1
 ```
 
-## Prepare your `Vagrantfile`
+### Optional but recommended
 
-As far as I know, there is no way to suppress Vagrant's warning of "Windows is not officially supported for the Ansible Control Machine." Instead, I suggest to working around it in excluding the provisioner of Ansible in your `Vagrantfile` when running on Windows and run Ansible afterward. To do so, modify your `Vagrantfile` along with the following template:
+Microsoft Windows may have a problem with the long filenames which are used by Cygwin sometimes. To prevent time-consuming errors relying on long path names, set the Windows registry value of `LongPathsEnabled` in `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem` to `1`.
+
+![Set Regedit value](./images/regedit-LongPathsEnabled.png)
+
+## Execution environment
+
+Now, we are prepared for a first run. You can execute Vagrant and Ansible either in the PowerShell or in a Cygwin shell.
+
+### PowerShell
+
+To run Vagrant and Ansible in the PowerShell, you must "redirect" Ansible's commands from the PowerShell to a Cygwin shell:
+
+* Create a directory called `Cygwin` in `C:\tools\`. If `C:\tools\` does not already exists, create it.
+* "Redirect" the Ansible commands from PowerShell to Cygwin when they are called. To do this, you have to create a BAT file for each Ansible command. You can find a complete list to copy or download [here](https://github.com/meengit/vagrant-ansible-windows/tree/main/tools/Cygwin). For demonstration purposes, I'll illustrate here only the BAT file for the `ansible` command itself:
+
+`ansible.bat`
+
+```bat
+@echo off
+
+set CYGWIN=C:cygwin
+
+REM You can switch this to work with bash with %CYGWIN%binzsh.exe
+set SH=%CYGWIN%/bin/bash.exe
+
+"%SH%" -c "/usr/local/bin/ansible %*"
+```
+
+#### Set the Windows' environment variables
+
+Add `C:\tools\Cygwin` to Windows's _System Variables_:
+
+![Edit Windows's System Variables](./images/win-system-var.png)
+
+Add `C:\tools\Cygwin` to your user's path:
+
+![Edit Windows User's path](./images/win-user-path.png)
+
+
+#### Run it!
+
+```bash
+vagrant up --provision
+```
+
+### Cygwin shell
+
+In a Cygwin shell, you can run Vagrant and the Ansible provider directly. To do so, open a Cygwin shell _as administrator_ (`C:\cygwin64\Cygwin.bat`), navigate to your project root (`cd /cygdrive/c/path/to/your/project/root`) and run:
+
+```bash
+vagrant up --provision
+```
+
+## Prevent Vagrant from calling the Ansible provider and run it independently instead
+
+It is also possible to run Ansible independently from Vagrant. With this workaround, Vagrant builds your VM but does not run Ansible. To do so, you have to update the Vagrant file a bit and create a little Shell script that manages Vagrant and Ansible.
+
+### Prepare your `Vagrantfile`
+
+Modify your `Vagrantfile` along with the following template:
 
 ```ruby
 # -*- mode: ruby -*-
@@ -199,15 +216,14 @@ Vagrant.configure(VERSION) do |config|
   #
   # ...
 
-  # Provisioning configuration for Ansible.
   config.vm.provision 'ansible' do |ansible|
     ansible.playbook = './ansible/main.yml'
     ansible.inventory_path = './ansible/develop.ini'
-  end unless Vagrant::Util::Platform.windows?
+  end unless Vagrant::Util::Platform.windows? # <<< Run the provisioner unless we are on Windows
 end
 ```
 
-## Last step: Run it!
+### Create the Shell script and run it
 
 To run Vagrant and Ansible in two steps, we create a little Shell script for the Cygwin environment:
 
