@@ -85,14 +85,14 @@ Microsoft Windows may have a problem with the long filenames which are used by C
 
 ![Set Regedit value](./images/regedit-LongPathsEnabled.png)
 
-##  Make `ansible` and `ansible-playbook` accessible for the PowerShell
+##  Redirect `ansible` and `ansible-*` from PowerShell to Cygwin
 
 You may want to use `ansible` also in the context of PowerShell and not only in the Cygwin shell. To achieve this, we have to make sure we're running Ansible in Cygwin's bash context each time it is called. To do so:
 
 * Create a directory called `Cygwin` in `C:\tools\`. If `C:\tools\` does not already exists, create it.
-* Put the following two files in `C:\tools\Cygwin`:
+* "Redirect" the Ansible commands from PowerShell to Cygwin when they are called. To do this, you have to create a BAT file for each Ansible command. You can find a complete list to copy or download [here](https://github.com/meengit/vagrant-ansible-windows/tree/main/tools/Cygwin). For demonstration purposes, I'll illustrate here only the BAT file for the `ansible` command itself:
 
-`ansible.bat`:
+`ansible.bat`
 
 ```bat
 @echo off
@@ -103,19 +103,6 @@ REM You can switch this to work with bash with %CYGWIN%binzsh.exe
 set SH=%CYGWIN%/bin/bash.exe
 
 "%SH%" -c "/usr/local/bin/ansible %*"
-```
-
-`ansible-playbook.bat`:
-
-```bat
-@echo off
-
-set CYGWIN=C:cygwin
-
-REM You can switch this to work with bash with %CYGWIN%binzsh.exe
-set SH=%CYGWIN%/bin/bash.exe
-
-"%SH%" -c "/usr/local/bin/ansible-playbook %*"
 ```
 
 Add `C:\tools\Cygwin` to Windows's _System Variables_:
@@ -194,24 +181,6 @@ As far as I know, there is no way to suppress Vagrant's warning of "Windows is n
 
 VERSION = '2'
 
-module OS
-  def self.windows?
-    (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
-  end
-
-  def self.mac?
-    (/darwin/ =~ RUBY_PLATFORM) != nil
-  end
-
-  def self.unix?
-    !OS.windows?
-  end
-
-  def self.linux?
-    OS.unix? and not OS.mac?
-  end
-end
-
 Vagrant.configure(VERSION) do |config|
   # # Your configuration, for example:
   #
@@ -225,21 +194,13 @@ Vagrant.configure(VERSION) do |config|
   #
   # ...
 
-  if OS.windows?
-    puts "Vagrant launched on Microsoft Windows. 'config.vm.provision' ignored!"
-  else
-    puts "Vagrant launched from #{OS.mac || OS.unix || OS.linux || 'unknown'} platform."
-
-    # Provisioning configuration for Ansible.
-    config.vm.provision 'ansible' do |ansible|
-      ansible.playbook = './ansible/main.yml'
-      ansible.inventory_path = './ansible/develop.ini'
-    end
-  end
+  # Provisioning configuration for Ansible.
+  config.vm.provision 'ansible' do |ansible|
+    ansible.playbook = './ansible/main.yml'
+    ansible.inventory_path = './ansible/develop.ini'
+  end unless Vagrant::Util::Platform.windows?
 end
 ```
-
-The function `OS` was initially copied from <a href="#Silva001"><em>"Find out current OS inside Vagrantfile."</em></a> (Silva, 2014)
 
 ## Last step: Run it!
 
@@ -267,5 +228,3 @@ OK! Great job, you are ready to start your VM and provision afterward. Do this i
 ## Bibliography
 
 <a name="Maurizi001" style="text-decoration: none;color: black;">Maurizi, M. (2014, October 30).</a> _Running Vagrant with Ansible Provisioning on Windows._ Azavea. https://www.azavea.com/blog/2014/10/30/running-vagrant-with-ansible-provisioning-on-windows/
-
-<a name="Silva001" style="text-decoration: none;color: black;">Silva, B. (2014, November 12).</a> _Ruby—Vagrant—How to have host platform specific provisioning steps._ Stack Overflow. https://stackoverflow.com/questions/26811089/vagrant-how-to-have-host-platform-specific-provisioning-steps
