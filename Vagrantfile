@@ -4,24 +4,6 @@
 
 VERSION = '2'
 
-module OS
-  def self.windows?
-    (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
-  end
-
-  def self.mac?
-    (/darwin/ =~ RUBY_PLATFORM) != nil
-  end
-
-  def self.unix?
-    !OS.windows?
-  end
-
-  def self.linux?
-    OS.unix? and not OS.mac?
-  end
-end
-
 Vagrant.configure(VERSION) do |config|
   # # Your configuration, for example:
   #
@@ -35,15 +17,9 @@ Vagrant.configure(VERSION) do |config|
   #
   # ...
 
-  if OS.windows?
-    puts "Vagrant launched on Microsoft Windows. 'config.vm.provision' ignored!"
-  else
-    puts "Vagrant launched from #{OS.mac || OS.unix || OS.linux || 'unknown'} platform."
-
-    # Provisioning configuration for Ansible.
-    config.vm.provision 'ansible' do |ansible|
-      ansible.playbook = './ansible/main.yml'
-      ansible.inventory_path = './ansible/develop.ini'
-    end
-  end
+  # Provisioning configuration for Ansible.
+  config.vm.provision 'ansible' do |ansible|
+    ansible.playbook = './ansible/main.yml'
+    ansible.inventory_path = './ansible/develop.ini'
+  end unless Vagrant::Util::Platform.windows?
 end
