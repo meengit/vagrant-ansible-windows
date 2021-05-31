@@ -1,14 +1,16 @@
 # Vagrant and the Ansible Provider on Microsoft Windows
 
-Please note: This document describes one of many ways to make Vagrant and Ansible playing together on Microsoft Windows. It is written with the intention to find a way that is compatible with as many Microsoft Windows hosts as possible. ***If you have questions, improvements, or found a bug, please file an issue.***
+In this guide, I describe a way make the Ansible provider of Vagrant work on Microsoft Windows. I try to rely on long proven and tested software to be also compatible with you and your instance of Microsoft Windows. Please use the [repository's issues](https://github.com/meengit/vagrant-ansible-windows/issues) to report a bug, suggest improvements or ask a question. My work initially based at Michael Maurizi's blog post <a href="#Maurizi001"><em>"Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
+ 
+## Context
 
-## Context 
+When Microsoft Windows is sitting behind, Vagrant and its Ansible Provider aren't a good team. This is because you can use **Ansible only to manage Windows** hosts but **not to run on Windows** hosts. So, how can we work around this fact in the context of Vagrant?
 
-When it comes to Microsoft Windows, ***Vagrant and its Ansible Provider*** aren't a good team because Windows is sitting behind. In a Google search, you can find many suggestions and tutorials making them play together - especially with the help of Microsoft's WSL platform. However, in my opinion, they all ending in a mess. Don't touch WSL at all! *So, what can we do? In short: migrate to [Chef.io](https://chef.io) or a similar tool with full support for Microsoft Windows. If you are, like me, bound to Ansible in some projects, follow this tutorial.*
+**In short:** migrate to [Chef.io](https://chef.io) or a similar tool with full support for Microsoft Windows. **Or a bit longer**, in my opinion: don't touch Microsoft's WSL platform and use stable and proven software instead.
 
 ## Introduction
 
-If you try to run *Vagrant with the Ansible Provider* on (native) Windows, you're ending up with this message:
+If you try to run *Vagrant with the Ansible Provider* on (native) Windows, you're may end up with this or a similar message of incompatibility:
 
 ```text
 # ...
@@ -28,7 +30,7 @@ Ansible failed to complete successfully. Any error output should be
 visible above. Please fix these errors and try again.
 ```
 
-To solve this issue and run your Ansible playbooks against your Vagrant VM also on Windows, I'll now navigate you through a solution I got up and running on an increasing number of Windows hosts. I don't say that's the best solution nor the only one. Instead, I try to give you a way that is also working for you. My work initially starts at Michael Maurizi's blog post <a href="#Maurizi001"><em>"Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
+A quick Google search will show you several solutions to workaround Ansible's incompatibility on Microsoft Windows. In my experience, especially proposals suggesting Microsoft's WSL platform often end up in a mess in the context of Vagrant. As far as I can see, this mainly happens because Vagrant is integrated with Windows (you have a Windows installer), and Ansible isn't. So, you have to build a bridge between Windows and WSL to make Vagrant able to "crossing the lines," which can become complex very fast, depending on your use case. But don't worry, there is a simple alternative. Instead of using WSL, we only have to make Vagrant believe that Ansible runs on a supported platform. To reach this, we use Cygwin.
 
 ## Install Cygwin
 
@@ -37,9 +39,9 @@ To solve this issue and run your Ansible playbooks against your Vagrant VM also 
 
 ## Install the required Cygwin packages for Ansible
 
-***Please notice: Currently, the last version of Python, which Cygwin supports, is 3.8. I'll do all further steps based on this version. Feel free to use a newer version but don't forget to change the Python version in all further steps.***
+***Hint: Currently, Cygwin's latest version of Python is 3.8. I'll do all steps based on this version. Feel free to use a newer version but don't forget to change the Python version in all further steps.***
 
-Cygwin is using its installer to install *and update* Cygwin. Each time you want to install additional packages, you have to run the Cygwin installer. So, head over to your `Downloads` folder and rerun the Cygwin installer.
+Cygwin is using its installer to install *and update* Cygwin. Each time you want to install additional packages, you have to run the Cygwin installer. So, head over to your `Downloads` folder and re-run the Cygwin installer.
 
 Click through the installation steps until the _"Select packages"_ window appears and change to the View _"Full."_ Now you have to select the following packages to install (use the drop-down in the column _"New"_):
 
@@ -56,7 +58,10 @@ Click through the installation steps until the _"Select packages"_ window appear
 * `wget`
   * Optional: `wget-debuginfo`
 
+***Hint: In some cases, I noticed a crashing Cygwin installer if I type too fast into the search field. Be patience! Type into the search field, wait, click your package, wait, delete all texts in the search field, wait, search for new package, wait... and so on.***
+
 ![Cygwin Package manager](./images/cygwin-ansible-packages.png)
+
 
 Now that you have selected all necessary packages for Ansible, click _"Next"_ and finish the installation process.
 
