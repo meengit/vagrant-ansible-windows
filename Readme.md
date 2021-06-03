@@ -1,6 +1,6 @@
 # Vagrant and the Ansible Provider on Microsoft Windows
 
-In this guide, I describe a way make the Ansible provider of Vagrant work on Microsoft Windows. I try to rely on long proven and tested software to be also compatible with you and your instance of Microsoft Windows. Please use the [repository's issues](https://github.com/meengit/vagrant-ansible-windows/issues) to report a bug, suggest improvements or ask a question. My work initially based at Michael Maurizi's blog post <a href="#Maurizi001"><em>"Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
+In this guide, I describe a way make the Ansible Provider of Vagrant work on Microsoft Windows. I try to rely on long proven and tested software to be also compatible with you and your instance of Microsoft Windows. Please use the [repository's issues](https://github.com/meengit/vagrant-ansible-windows/issues) to report a bug, suggest improvements or ask a question. My work initially based at Michael Maurizi's blog post <a href="#Maurizi001"><em>"Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
  
 ## Context
 
@@ -30,7 +30,7 @@ Ansible failed to complete successfully. Any error output should be
 visible above. Please fix these errors and try again.
 ```
 
-A quick Google search will show you several solutions to workaround Ansible's incompatibility on Microsoft Windows. In my experience, especially proposals suggesting Microsoft's WSL platform often end up in a mess in the context of Vagrant. As far as I can see, this mainly happens because Vagrant is integrated with Windows (you have a Windows installer), and Ansible isn't. So, you have to build a bridge between Windows and WSL to make Vagrant able to "crossing the lines," which can become complex very fast, depending on your use case. But don't worry, there is a simple alternative. Instead of using WSL, we only have to make Vagrant believe that Ansible runs on a supported platform. To reach this, we use Cygwin.
+A quick Google search will show you several solutions to workaround Ansible's incompatibility on Microsoft Windows. In my experience, especially proposals suggesting Microsoft's WSL platform often end up in a mess in the context of Vagrant. As far as I can see, this mainly happens because Vagrant is integrated with Windows (you have a Windows installer), and Ansible isn't. So, you have to build a bridge between Windows and WSL to make Vagrant able to "crossing the lines," which can become complex very fast, depending on your use case. But don't worry, there is a simple alternative based on Cygwin.
 
 ## Install Cygwin
 
