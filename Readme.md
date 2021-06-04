@@ -199,7 +199,7 @@ The disadvantages of this solution, which I discovered, are also several types o
 
 ### How do I get Vagrant's SSH configuration?
 
-You have to run Vagrant at a minimum once to create your VM. If your Ansible Provider fails, you can temporarily disable the provider by adding a `unless` statement to the end of the provider configuration in your `Vagrantfile`. Example
+You have to run Vagrant at a minimum once to create your VM. If your Ansible Provider fails, you can temporarily disable the provider by adding a `unless` statement to the end of the provider configuration in your `Vagrantfile`. Example:
 
 ```diff
   # -*- mode: ruby -*-
