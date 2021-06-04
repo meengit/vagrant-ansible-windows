@@ -84,6 +84,21 @@ alias pip='python3 -m pip'
 
 But why we have to set this? Depending on your environment, it's maybe optional. Settings these properties makes sure we have no conflicts with possible "native" Python installations on Microsoft Windows (for instance in `C:\Python39\python.exe`).
 
+### Optional but recommended
+
+Microsoft Windows may have a problem with the long filenames which are used by Cygwin sometimes. To prevent time-consuming errors relying on long path names, set the Windows registry value of `LongPathsEnabled` in `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem` to `1`.
+
+![Set Regedit value](./images/regedit-LongPathsEnabled.png)
+
+### Install Ansible in the Cygwin Shell
+
+Open a Cygwin shell _as administrator_ (`C:\cygwin64\Cygwin.bat`) and install Ansible using `pip`. Because some users reported issues with a missing [`wcwidth`](https://pypi.org/project/wcwidth/) package, I recommend first installing `wcwidth` to be sure it is present, and then Ansible:
+
+```bash
+pip install wcwidth
+pip install ansible
+```
+
 ### Create the `ansible.cfg`
 
 Create your "main" configuration file for Ansible in your Cygwin environment:
@@ -96,7 +111,7 @@ Create your "main" configuration file for Ansible in your Cygwin environment:
 control_path = /tmp
 ```
 
-* Go to `C:\` and create the directory `C:\tmp\`
+`/tmp` in the Cygwin Shell will be mapped to  `C:\cygwin64\tmp\` on Windows.
 
 ### Prepare your inventory file
 
@@ -132,12 +147,6 @@ ansible_connection=ssh
 ansible_port=4000
 ansible_debug=1
 ```
-
-### Optional but recommended
-
-Microsoft Windows may have a problem with the long filenames which are used by Cygwin sometimes. To prevent time-consuming errors relying on long path names, set the Windows registry value of `LongPathsEnabled` in `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem` to `1`.
-
-![Set Regedit value](./images/regedit-LongPathsEnabled.png)
 
 ## Execution environment
 
