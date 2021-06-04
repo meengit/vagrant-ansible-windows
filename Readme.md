@@ -115,7 +115,7 @@ control_path = /tmp
 
 ### Access Vagrant's `insecure_private_key` (or a custom SSH key)
 
-It's a common use case to use Vagrant's insecure SSH private key for Vagrant's Ansible Provider. It's a common use case to use Vagrant's insecure SSH private key for Vagrant's Ansible Provider in Ansible's inventory file:
+It's a common use case to use Vagrant's insecure SSH private key for Vagrant's Ansible Provider in Ansible's inventory file:
 
 ```text
 ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
