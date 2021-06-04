@@ -113,51 +113,69 @@ control_path = /tmp
 
 `/tmp` in the Cygwin Shell will be mapped to  `C:\cygwin64\tmp\` on Windows.
 
-### Prepare your inventory file
+### Access Vagrant's `insecure_private_key` (or a custom SSH key)
 
-In some cases, it may be helpful to create a dedicated inventory file just for Windows. However, you can also modify an existing inventory file. To make your inventory file ready to run in Cygwin's environment, first ask Vagrant for its SSH configuration. Open a Cygwin shell _as Administrator_ (`C:\cygwin64\Cygwin.bat`), go to your Vagrant project root (`cd /cygdrive/c/path/to/your/project/root`) and run:
+It's a common use case to use Vagrant's insecure SSH private key for Vagrant's Ansible Provider. It's a common use case to use Vagrant's insecure SSH private key for Vagrant's Ansible Provider in Ansible's inventory file:
 
-```bash
-vagrant ssh-config
-
-# Output:
-Host default
-  HostName 127.0.0.1
-  User vagrant
-  Port 4000
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-  IdentityFile C:/Users/__USER__/.vagrant.d/insecure_private_key
-  IdentitiesOnly yes
-  LogLevel FATAL
+```text
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
 ```
 
-Update your inventory file with the results from `vagrant ssh-config`, but make sure `ansible_ssh_private_key_file` is set to Cgywin's full path:
+
+Even you use a custom SSH private key instead of Vagrant's, the key must be accessible from the Cygwin Shell. For Vagrant's insecure SSH private key, I suggest linking it from your Windows' user home to your Cygwin user home. To do so, open a Cygwin Shell _as Administrator_ and run from your user home:
 
 ```bash
-[server]
-127.0.0.1
+# in /home/__USER__
+$ ln -s /cygdrive/c/Users/run/.vagrant.d/ .vagrant.d
+```
 
-[server:vars]
-ansible_user=vagrant
-# ansible_ssh_pass=vagrant # Optional
+Alternatively, you can also create a Windows related inventory file or update your inventory file with the Cygwin path to Vagrant's insecure private key:
+
+```text
 ansible_ssh_private_key_file=/cygdrive/c/Users/__USER__/.vagrant.d/insecure_private_key
-ansible_connection=ssh
-ansible_port=4000
-ansible_debug=1
 ```
 
-## Execution environment
+So, an example inventory file can look like this:
 
-Now, we are prepared for a first run. You can execute Vagrant and Ansible either in the PowerShell or in a Cygwin shell.
+```bash
+# Application Server
+[app]
+192.168.60.6
 
-### PowerShell
+# Database Server
+[db]
+192.168.60.8
 
-To run Vagrant and Ansible in the PowerShell, you must "redirect" Ansible's commands from the PowerShell to a Cygwin shell:
+# Group 'common' with all servers
+[common:children]
+app
+db
 
-* Create a directory called `Cygwin` in `C:\tools\`. If `C:\tools\` does not already exists, create it.
-* "Redirect" the Ansible commands from PowerShell to Cygwin when they are called. To do this, you have to create a BAT file for each Ansible command. You can find a complete list to copy or download [here](https://github.com/meengit/vagrant-ansible-windows/tree/main/tools/Cygwin). For demonstration purposes, I'll illustrate here only the BAT file for the `ansible` command itself:
+[common:vars]
+ansible_ssh_user=vagrant
+# for ln -s "solution:" ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+ansible_ssh_private_key_file=/cygdrive/c/Users/__USER__/.vagrant.d/insecure_private_key
+ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no"
+```
+
+Suppose you are using a custom private key. In that case, I suggest to place it in the SSH directory of your Cygwin user (`C:\cygwin64\home\__USER__\.ssh` in Windows Explorer) and link them to your inventory file:
+
+```text
+ansible_ssh_private_key_file=~/.ssh/__YOUR_PRIVATE_KEY__
+```
+
+## Run `vagrant`
+
+Now, we should be prepared to run `vagrant up.` To do so, open a Cygwin Shell _as Administrator_, navigate to your Vagrant project and bring it up:
+
+```bash
+cd /cygdrive/c/path/to/your/project/root
+vagrant up --provision
+```
+
+### Notes about the technical background
+
+This guide aims to be as simple and as generic as possible. As far as I can see, running Vagrant and its Ansible Provider in the Cygwin Shell is actually the easiest and most secure way to not run into network or permission issues. Another solution, aside from WSL2 we try to avoid, can be to "redirect" the Ansible commands from PowerShell to Cygwin using BAT files, for example:
 
 `ansible.bat`
 
@@ -172,87 +190,62 @@ set SH=%CYGWIN%/bin/bash.exe
 "%SH%" -c "/usr/local/bin/ansible %*"
 ```
 
-#### Set the Windows' environment variables
+The disadvantages of this solution, which I discovered, are also several types of SSH connection issues when the Ansible Provider starts. If you're using the Cygwin Shell, a full Bash environment getting initiated (`bash --login -i`). In opposite, calling Ansible via a BAT file, you don't get a complete interactive Cygwin environment. So, depending on your Windows Build and your environment, you may end up in either issue:
 
-Add `C:\tools\Cygwin` to Windows's _System Variables_:
+- permission issues because the process didn't get administration privileges via BAT file;
+- SSH connection issues because Windows calls the System32 SSH from the PowerShell environment; instead of Cygwin's SSH implementation.
 
-![Edit Windows's System Variables](./images/win-system-var.png)
+## Troubleshooting
 
-Add `C:\tools\Cygwin` to your user's path:
+### How do I get Vagrant's SSH configuration?
 
-![Edit Windows User's path](./images/win-user-path.png)
+You have to run Vagrant at a minimum once to create your VM. If your Ansible Provider fails, you can temporarily disable the provider by adding a `unless` statement to the end of the provider configuration in your `Vagrantfile`. Example
 
+```diff
+  # -*- mode: ruby -*-
+  # vi: set ft=ruby :
+  # frozen_string_literal: true
 
-#### Run it!
+  VERSION = '2'
 
-```bash
-vagrant up --provision
+  Vagrant.configure(VERSION) do |config|
+    # # Your configuration, for example:
+    #
+    # config.vm.box = 'debian/buster64'
+    #
+    # # Set the provider to host the VM
+    # config.vm.provider 'virtualbox' do |vm|
+    #   vm.gui = false
+    #   vm.memory = 2048
+    # end
+    #
+    # ...
+
+    config.vm.provision 'ansible' do |ansible|
+      ansible.playbook = './ansible/main.yml'
+      ansible.inventory_path = './ansible/develop.ini'
+-   end
++   end unless Vagrant::Util::Platform.windows? # <<< Run the provisioner unless we are on Windows
+  end
 ```
 
-### Cygwin shell
-
-In a Cygwin shell, you can run Vagrant and the Ansible provider directly. To do so, open a Cygwin shell _as administrator_ (`C:\cygwin64\Cygwin.bat`), navigate to your project root (`cd /cygdrive/c/path/to/your/project/root`) and run:
+Afterward, run:
 
 ```bash
-vagrant up --provision
-```
+vagrant up
+vagrant ssh-config
 
-## Prevent Vagrant from calling the Ansible provider and run it independently instead
-
-It is also possible to run Ansible independently from Vagrant. With this workaround, Vagrant builds your VM but does not run Ansible. To do so, you have to update the Vagrant file a bit and create a little Shell script that manages Vagrant and Ansible.
-
-### Prepare your `Vagrantfile`
-
-Modify your `Vagrantfile` along with the following template:
-
-```ruby
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-# frozen_string_literal: true
-
-VERSION = '2'
-
-Vagrant.configure(VERSION) do |config|
-  # # Your configuration, for example:
-  #
-  # config.vm.box = 'debian/buster64'
-  #
-  # # Set the provider to host the VM
-  # config.vm.provider 'virtualbox' do |vm|
-  #   vm.gui = false
-  #   vm.memory = 2048
-  # end
-  #
-  # ...
-
-  config.vm.provision 'ansible' do |ansible|
-    ansible.playbook = './ansible/main.yml'
-    ansible.inventory_path = './ansible/develop.ini'
-  end unless Vagrant::Util::Platform.windows? # <<< Run the provisioner unless we are on Windows
-end
-```
-
-### Create the Shell script and run it
-
-To run Vagrant and Ansible in two steps, we create a little Shell script for the Cygwin environment:
-
-`vagrant-win.sh`:
-
-```bash
-!#/usr/bin/env bash
-
-set -x -e
-
-vagrant up --provision # --provider virtualbox
-ansible-playbook -i __INVENTORY__ --ssh-extra-args='-p 4000 -i /cygdrive/c/Users/__USER__/.vagrant.d/insecure_private_key' --ssh-common-args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o IdentitiesOnly=yes' __PLAYBOOK__
-```
-
-Replace `__INVENTORY__` with the path to your inventory file, `__PLAYBOOK__` with the path to your playbook entry file, and `__USER__` with your user name and save the file in the same place as the `Vagrantfile` of your project.
-
-OK! Great job, you are ready to start your VM and provision afterward. Do this in the Cygwin shell (_as Administrator_). Let's go:
-
-```bash
-. ./vagrant-win.sh
+# Output:
+Host default
+  HostName 127.0.0.1
+  User vagrant
+  Port 4000
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile C:/Users/__USER__/.vagrant.d/insecure_private_key
+  IdentitiesOnly yes
+  LogLevel FATAL
 ```
 
 ## Bibliography
