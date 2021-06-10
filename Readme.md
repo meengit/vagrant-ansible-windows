@@ -109,6 +109,7 @@ Create your "main" configuration file for Ansible in your Cygwin environment:
 ```bash
 [ssh_connection]
 control_path = /tmp
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s
 ```
 
 `/tmp` in the Cygwin Shell will be mapped to  `C:\cygwin64\tmp\` on Windows.
