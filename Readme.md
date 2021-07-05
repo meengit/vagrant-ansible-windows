@@ -112,6 +112,33 @@ control_path = /tmp
 ssh_args = -o ControlMaster=auto -o ControlPersist=60s
 ```
 
+### Make `ansible`, `ansible-playbook`, and others accessible for Vagrant
+
+Even we are running Vagrant in the Cygwin Shell, we have to ensure that Vagrant is also taking the Cygwin Shell as the execution environment for Ansible. To achieve this, we have to "redirect" Ansible's commands to Cygwin's bash context systemwide. To do so:
+
+* Create a directory called `Cygwin` in `C:\tools\`. If `C:\tools\` does not already exists, create it.
+* https://github.com/meengit/vagrant-ansible-windows/tree/main/tools/Cygwin[Download the files from the directory `tools` of this repository and place them in `C:\tools\Cygwin`]. Check if the paths are set correctly and matching your configuration and installation directory of Cygwin. As an example `ansible.bat`:
+
+```bat
+@echo off
+
+set CYGWIN=C:cygwin
+
+REM You can switch this to work with bash with %CYGWIN%binzsh.exe
+set SH=%CYGWIN%/bin/bash.exe
+
+"%SH%" -c "/usr/local/bin/ansible %*"
+```
+
+Add `C:\tools\Cygwin` to Windows's _System Variables_:
+
+![Edit Windows's System Variables](./images/win-system-var.png)
+
+Add `C:\tools\Cygwin` to your user's path:
+
+![Edit Windows User's path](./images/win-user-path.png)
+
+
 `/tmp` in the Cygwin Shell will be mapped to  `C:\cygwin64\tmp\` on Windows.
 
 ### Access Vagrant's `insecure_private_key` (or a custom SSH key)
