@@ -117,7 +117,7 @@ ssh_args = -o ControlMaster=auto -o ControlPersist=60s
 Even we are running Vagrant in the Cygwin Shell, we have to ensure that Vagrant is also taking the Cygwin Shell as the execution environment for Ansible. To achieve this, we have to "redirect" Ansible's commands to Cygwin's bash context systemwide. To do so:
 
 * Create a directory called `Cygwin` in `C:\tools\`. If `C:\tools\` does not already exists, create it.
-* https://github.com/meengit/vagrant-ansible-windows/tree/main/tools/Cygwin[Download the files from the directory `tools` of this repository and place them in `C:\tools\Cygwin`]. Check if the paths are set correctly and matching your configuration and installation directory of Cygwin. As an example `ansible.bat`:
+* https://github.com/meengit/vagrant-ansible-windows/tree/main/tools/Cygwin[Download] the files from the directory `tools` of this repository and place them in `C:\tools\Cygwin`. Check if the paths are set correctly and matching your configuration and installation directory of Cygwin. As an example `ansible.bat`:
 
 ```bat
 @echo off
