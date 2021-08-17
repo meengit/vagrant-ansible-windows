@@ -201,28 +201,6 @@ cd /cygdrive/c/path/to/your/project/root
 vagrant up --provision
 ```
 
-### Notes about the technical background
-
-This guide aims to be as simple and as generic as possible. As far as I can see, running Vagrant and its Ansible Provider in the Cygwin Shell is actually the easiest and most secure way to not run into network or permission issues. Another solution, aside from WSL2 we try to avoid, can be to "redirect" the Ansible commands from PowerShell to Cygwin using BAT files, for example:
-
-`ansible.bat`
-
-```bat
-@echo off
-
-set CYGWIN=C:cygwin
-
-REM You can switch this to work with bash with %CYGWIN%binzsh.exe
-set SH=%CYGWIN%/bin/bash.exe
-
-"%SH%" -c "/usr/local/bin/ansible %*"
-```
-
-The disadvantages of this solution, which I discovered, are also several types of SSH connection issues when the Ansible Provider starts. If you're using the Cygwin Shell, a full Bash environment getting initiated (`bash --login -i`). In opposite, calling Ansible via a BAT file, you don't get a complete interactive Cygwin environment. So, depending on your Windows Build and your environment, you may end up in either issue:
-
-- permission issues because the process didn't get administration privileges via BAT file;
-- SSH connection issues because Windows calls the System32 SSH from the PowerShell environment; instead of Cygwin's SSH implementation.
-
 ## Troubleshooting
 
 ### How do I get Vagrant's SSH configuration?
