@@ -203,6 +203,35 @@ vagrant up --provision
 
 ## Troubleshooting
 
+## Time out, unable to communicate with the guest
+
+Sometimes, Vagrant can't establish an SSH connection even your Vagrant Machine is running:
+
+```bash
+...
+==> mgek2: Booting VM...
+==> mgek2: Waiting for machine to boot. This may take a few minutes...
+    mgek2: SSH address: 127.0.0.1:4000
+    mgek2: SSH username: vagrant
+    mgek2: SSH auth method: private key
+Timed out while waiting for the machine to boot. This means that
+Vagrant was unable to communicate with the guest machine within
+the configured ("config.vm.boot_timeout" value) time period.
+
+...
+
+If the box appears to be booting properly, you may want to increase
+the timeout ("config.vm.boot_timeout") value.
+```
+
+If that happens, you can try to increase the time-out setting in [`config.vm.boot_timeout`](https://www.vagrantup.com/docs/vagrantfile/machine_settings#config-vm-boot_timeout). Alternatively, you can run Ansible directly from Cygwin' shell with evaluated administrator privileges: 
+
+```bash
+ansible-playbook -i __INVENTORY__ --ssh-extra-args='-p __PORT__ -i /cygdrive/c/Users/__USER__/.vagrant.d/insecure_private_key' --ssh-common-args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o IdentitiesOnly=yes' __PLAYBOOK__
+```
+
+Replace `__INVENTORY__` with inventory file's path, `__PLAYBOOK__` with your playbook's entry file, `__PORT__` with your SSH port, and `__USER__` with your user name.
+
 ### How do I get Vagrant's SSH configuration?
 
 You have to run Vagrant at a minimum once to create your VM. If your Ansible Provider fails, you can temporarily disable the provider by adding a `unless` statement to the end of the provider configuration in your `Vagrantfile`. Example:
@@ -253,35 +282,6 @@ Host default
   IdentitiesOnly yes
   LogLevel FATAL
 ```
-
-## Time out, unable to communicate with the guest
-
-Sometimes, Vagrant can't establish an SSH connection even your Vagrant Machine is running:
-
-```bash
-...
-==> mgek2: Booting VM...
-==> mgek2: Waiting for machine to boot. This may take a few minutes...
-    mgek2: SSH address: 127.0.0.1:4000
-    mgek2: SSH username: vagrant
-    mgek2: SSH auth method: private key
-Timed out while waiting for the machine to boot. This means that
-Vagrant was unable to communicate with the guest machine within
-the configured ("config.vm.boot_timeout" value) time period.
-
-...
-
-If the box appears to be booting properly, you may want to increase
-the timeout ("config.vm.boot_timeout") value.
-```
-
-If that happens, you can try to increase the time-out setting in [`config.vm.boot_timeout`](https://www.vagrantup.com/docs/vagrantfile/machine_settings#config-vm-boot_timeout). Alternatively, you can run Ansible directly from Cygwin' shell with evaluated administrator privileges: 
-
-```bash
-ansible-playbook -i __INVENTORY__ --ssh-extra-args='-p 4000 -i /cygdrive/c/Users/__USER__/.vagrant.d/insecure_private_key' --ssh-common-args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o IdentitiesOnly=yes' __PLAYBOOK__
-```
-
-Replace `__INVENTORY__` with the path to your inventory file, `__PLAYBOOK__` with the path to your playbook entry file, and `__USER__` with your user name.
 
 ## Bibliography
 
