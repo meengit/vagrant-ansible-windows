@@ -203,7 +203,7 @@ vagrant up --provision
 
 ## Troubleshooting
 
-## Time out, unable to communicate with the guest
+### Time out, unable to communicate with the guest
 
 Sometimes, Vagrant can't establish an SSH connection even your Vagrant Machine is running:
 
@@ -282,6 +282,22 @@ Host default
   IdentitiesOnly yes
   LogLevel FATAL
 ```
+
+#### Be careful for usage with `ansible-playbook`
+
+Vagrant returns the internal SSH configuration that Vagrant uses. However, suppose you have configured an IP for your Vagrant Machine. In that case, I recommend you shouldn't go with Vagrant's SSH connection when running `ansible-playbook`. Use the configured IP and port of the Machine instead. For example, if you have in your Vagrantfile:
+
+```ruby
+config.vm.network :private_network, ip: '192.168.90.100'
+```
+
+Start your Vagrant Machine and check if you can establish an SSH connection:
+
+```bash
+ssh vagrant@192.168.90.100 -i -i ~/.vagrant.d/insecure_private_key
+```
+
+If this works, use the desired IP and Port, 192.168.90.100 and 22 (default) in that example, for your inventory file, and [in case you run ansible-playbook directly](#time-out-unable-to-communicate-with-the-guest) without Vagrant.
 
 ## Bibliography
 
