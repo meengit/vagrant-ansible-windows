@@ -1,6 +1,6 @@
 # Vagrant and the Ansible Provider on Microsoft Windows
 
-In this guide, I describe a way make the Ansible Provider of Vagrant work on Microsoft Windows. I try to rely on long proven and tested software to be also compatible with you and your instance of Microsoft Windows. Please use the [repository's issues](https://github.com/meengit/vagrant-ansible-windows/issues) to report a bug, suggest improvements or ask a question. My work initially based at Michael Maurizi's blog post <a href="#Maurizi001"><em>"Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
+In this guide, I describe a way to make Vagrant's Ansible Provider work on Microsoft Windows. I try to rely on long proven and tested software to be also compatible with you and your instance of Microsoft Windows. Please use the [repository's issues](https://github.com/meengit/vagrant-ansible-windows/issues) to report a bug, suggest improvements or ask a question. My work initially based at Michael Maurizi's blog post <a href="#Maurizi001"><em>"Running Vagrant with Ansible Provisioning on Windows."</em></a> (2014)
  
 ## Context
 
@@ -82,7 +82,7 @@ alias pip='python3 -m pip'
 * `PYTHONPATH` points Python to additional directories holding private libraries. In the context of Cygwin, Python gets installed in the `lib` folder of Cygwin, and we have to make sure, Python recognizing this fact.
 * In the third line, we're map the `pip` command correctly into our Cygwin environment.
 
-But why we have to set this? Depending on your environment, it's maybe optional. Settings these properties makes sure we have no conflicts with possible "native" Python installations on Microsoft Windows (for instance in `C:\Python39\python.exe`).
+But why we have to set this? Depending on your environment, it's maybe optional. Setting these properties makes sure we have no conflicts with possible "native" Python installations on Microsoft Windows (for instance in `C:\Python39\python.exe`).
 
 ### Optional but recommended
 
