@@ -294,7 +294,7 @@ config.vm.network :private_network, ip: '192.168.90.100'
 Start your Vagrant Machine and check if you can establish an SSH connection:
 
 ```bash
-ssh vagrant@192.168.90.100 -i -i ~/.vagrant.d/insecure_private_key
+ssh vagrant@192.168.90.100 -i ~/.vagrant.d/insecure_private_key
 ```
 
 If this works, use the desired IP and Port, 192.168.90.100 and 22 (default) in that example, for your inventory file, and [in case you run ansible-playbook directly](#time-out-unable-to-communicate-with-the-guest) without Vagrant.
