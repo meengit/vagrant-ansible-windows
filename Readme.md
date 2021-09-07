@@ -254,6 +254,35 @@ Host default
   LogLevel FATAL
 ```
 
+## Time out, unable to communicate with the guest
+
+Sometimes, Vagrant can't establish an SSH connection even your Vagrant Machine is running:
+
+```bash
+...
+==> mgek2: Booting VM...
+==> mgek2: Waiting for machine to boot. This may take a few minutes...
+    mgek2: SSH address: 127.0.0.1:4000
+    mgek2: SSH username: vagrant
+    mgek2: SSH auth method: private key
+Timed out while waiting for the machine to boot. This means that
+Vagrant was unable to communicate with the guest machine within
+the configured ("config.vm.boot_timeout" value) time period.
+
+...
+
+If the box appears to be booting properly, you may want to increase
+the timeout ("config.vm.boot_timeout") value.
+```
+
+If that happens, you can try to increase the time-out setting in [`config.vm.boot_timeout`](https://www.vagrantup.com/docs/vagrantfile/machine_settings#config-vm-boot_timeout). Alternatively, you can run Ansible directly from Cygwin' shell with evaluated administrator privileges: 
+
+```bash
+ansible-playbook -i __INVENTORY__ --ssh-extra-args='-p 4000 -i /cygdrive/c/Users/__USER__/.vagrant.d/insecure_private_key' --ssh-common-args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o IdentitiesOnly=yes' __PLAYBOOK__
+```
+
+Replace `__INVENTORY__` with the path to your inventory file, `__PLAYBOOK__` with the path to your playbook entry file, and `__USER__` with your user name.
+
 ## Bibliography
 
 <a name="Maurizi001" style="text-decoration: none;color: black;">Maurizi, M. (2014, October 30).</a> _Running Vagrant with Ansible Provisioning on Windows._ Azavea. https://www.azavea.com/blog/2014/10/30/running-vagrant-with-ansible-provisioning-on-windows/
